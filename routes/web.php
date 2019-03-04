@@ -12,16 +12,6 @@
 */
 
 Route::get('/', function () {
-
-    \Illuminate\Support\Facades\DB::table('users')->insert([
-        'name' => 'bogdan',
-        'email' => 'bog@ram.com',
-        'password' => 'password',
-        'api_token' => \Illuminate\Support\Str::random(60)
-    ]);
-
-
-
     return view('welcome');
 });
 

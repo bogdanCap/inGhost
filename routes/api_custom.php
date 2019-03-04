@@ -13,21 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    /*
-    if (!$user = \Illuminate\Support\Facades\Auth::user()) {
-        if (Illuminate\Support\Facades\Auth::attempt([
-            'email' => 'bog@ram.com', 'password' => 'password'
-        ]))
-        {
-
-        }
-    };
-    */
-
-    return $request->user();
-});
-
-Route::get('/test', function (Request $request) {
-    dd('ok');
+Route::middleware(['auth:api', 'userActivity'])->group(function () {
+    Route::get('/getData', 'Data\DataController@getData')->name('data');
 });

@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
                 ->unique()
                 ->nullable()
                 ->default(null);
+            $table->timestamp('last_activity');
             $table->rememberToken();
             $table->timestamps();
         });
