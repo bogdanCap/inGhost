@@ -17,7 +17,7 @@ class CreateChatMessageTable extends Migration
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->string('message', 255);
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->unique();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('parent_user_id');
             $table->timestamps();
