@@ -54,3 +54,13 @@ if (token) {
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     encrypted: true
 // });
+
+import Echo from "laravel-echo"
+window.Pusher = require('pusher-js');
+window.Echo = new Echo({
+    authEndpoint: '/chat/auth',
+    broadcaster: 'pusher',
+    key: '7436ac433543c98e4543',
+    cluster: 'eu',
+    encrypted: true
+});
