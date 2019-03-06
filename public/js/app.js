@@ -59348,22 +59348,38 @@ var app = new Vue({
     messages: []
   },
   created: function created() {
-    var _this = this;
+    this.fetchMessages(); //read message data from pusher if we need to read message from pusher
+    //but now we reed message from our local db in fetchMessages()
 
-    this.fetchMessages();
-    Echo.private('chat').listen('MessageSent', function (e) {
-      _this.messages.push({
-        message: e.message.message,
-        user: e.user
-      });
+    /*
+    Echo.private('private-chat')
+    .listen('my-event', (e) => {
+        this.messages.push({
+            message: e.message.message,
+            user: e.user
+       });
     });
+    */
+
+    /*
+    //get message from pusher -> PP define in bootstrap.js
+    var self = this;
+    var channel = PP.subscribe('private-chat');
+    channel.bind('my-event', function(data) {
+        let param = JSON.stringify(data);
+        self.messages.push({
+            message: param.message,
+            user: {name:'test'}
+        })
+    });
+    */
   },
   methods: {
     fetchMessages: function fetchMessages() {
-      var _this2 = this;
+      var _this = this;
 
       axios.get('/messages').then(function (response) {
-        _this2.messages = response.data;
+        _this.messages = response.data;
       });
     },
     addMessage: function addMessage(message) {
@@ -59439,12 +59455,25 @@ if (token) {
 
 
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
-window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
+/*
+window.Echo = new Echo({
+    authEndpoint: '/chat/auth',
+    broadcaster: 'pusher',
+    key: '7436ac433543c98e4543',
+    cluster: 'eu',
+    encrypted: true
+});
+*/
+
+window.PP = new Pusher('7436ac433543c98e4543', {
   authEndpoint: '/chat/auth',
-  broadcaster: 'pusher',
-  key: '7436ac433543c98e4543',
+  auth: {
+    headers: {
+      'X-CSRF-Token': token.content
+    }
+  },
   cluster: 'eu',
-  encrypted: true
+  forceTLS: true
 });
 
 /***/ }),

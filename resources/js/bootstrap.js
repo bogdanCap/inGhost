@@ -57,6 +57,7 @@ if (token) {
 
 import Echo from "laravel-echo"
 window.Pusher = require('pusher-js');
+/*
 window.Echo = new Echo({
     authEndpoint: '/chat/auth',
     broadcaster: 'pusher',
@@ -64,3 +65,19 @@ window.Echo = new Echo({
     cluster: 'eu',
     encrypted: true
 });
+*/
+//Pusher initialization
+window.PP = new Pusher('7436ac433543c98e4543', {
+    authEndpoint: '/chat/auth',
+    auth: {
+        headers: {
+            'X-CSRF-Token': token.content
+        }
+    },
+    cluster: 'eu',
+    forceTLS: true
+});
+
+
+
+

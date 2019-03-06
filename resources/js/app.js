@@ -41,13 +41,30 @@ const app = new Vue({
     created() {
         this.fetchMessages();
 
-        Echo.private('chat')
-            .listen('MessageSent', (e) => {
-                this.messages.push({
-                message: e.message.message,
-                user: e.user
+        //read message data from pusher if we need to read message from pusher
+        //but now we reed message from our local db in fetchMessages()
+         /*
+         Echo.private('private-chat')
+         .listen('my-event', (e) => {
+             this.messages.push({
+                 message: e.message.message,
+                 user: e.user
             });
+         });
+         */
+        /*
+        //get message from pusher -> PP define in bootstrap.js
+        var self = this;
+        var channel = PP.subscribe('private-chat');
+        channel.bind('my-event', function(data) {
+            let param = JSON.stringify(data);
+            self.messages.push({
+                message: param.message,
+                user: {name:'test'}
+            })
         });
+        */
+
     },
 
     methods: {
@@ -62,7 +79,7 @@ const app = new Vue({
 
             axios.post('/messages', message).then(response => {
                 console.log(response.data);
-        });
+            });
         }
     }
 });

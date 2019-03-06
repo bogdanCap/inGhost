@@ -6,8 +6,10 @@ use App\Events\MessageSent;
 use App\MessageBrodcast;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Pusher\Pusher;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ChatsController extends Controller
 {
@@ -31,7 +33,7 @@ class ChatsController extends Controller
      */
     public function fetchMessages()
     {
-        return MessageBrodcast::with('user')->get();
+        return MessageBrodcast::with('user')->orderBy('id', 'desc')->take(5)->get();
     }
 
     /**
@@ -50,21 +52,51 @@ class ChatsController extends Controller
 
         broadcast(new MessageSent($user, $message))->toOthers();
 
+        $appId = env('PUSHER_APP_ID');
+        $appKey = env('PUSHER_APP_KEY');
+        $appSecret = env('PUSHER_APP_SECRET');
+        $appCluster = env('PUSHER_APP_CLUSTER');
+        $options = array(
+            'cluster' => $appCluster,
+            'useTLS' => true
+        );
+        $pusher = new Pusher(
+            $appKey,
+            $appSecret,
+            $appId,
+            $options
+        );
+        //add message into pusher need only if we need to retrive message from pusher in front
+        $data['message'] = $request->get('message');
+        $pusher->trigger('private-chat', 'my-event', $data);
 
         return ['status' => 'Message Sent!'];
     }
 
+    /**
+     * @param Request $request
+     */
     public function pusherAuth(Request $request)
     {
-        $appId = getenv('PUSHER_APP_ID');
-        $appKey = getenv('PUSHER_APP_KEY');
-        $appSecret = getenv('c2fbb6231384974a23d5');
-        $appCluster = getenv('PUSHER_APP_CLUSTER');
-        $pusher = new Pusher( $appKey, $appSecret, $appId, array( 'cluster' => $appCluster, 'useTLS' => true, 'curl_options' => array( CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4 ) ) );
-        $pusher->socket_auth($request->get('channel_name'),$request->get('socket_id'));
+        //this method need only if we need to read message from pusher in frontend
+        $appId = env('PUSHER_APP_ID');
+        $appKey = env('PUSHER_APP_KEY');
+        $appSecret = env('PUSHER_APP_SECRET');
+        $appCluster = env('PUSHER_APP_CLUSTER');
+        $options = array(
+            'cluster' => $appCluster,
+            'useTLS' => true
+        );
+        $pusher = new Pusher(
+            $appKey,
+            $appSecret,
+            $appId,
+            $options
+        );
 
-        return response()->json([
-            false
-        ]);
+        $user = Auth::user();
+        $data['message'] = $request->get('message');
+        $presence_data = array('name' => $user->getAuthIdentifierName().'test');
+        echo $pusher->presence_auth($_POST['channel_name'], $_POST['socket_id'], $user->getAuthIdentifier(), $presence_data);
     }
 }
