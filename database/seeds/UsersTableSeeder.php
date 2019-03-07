@@ -17,5 +17,11 @@ class UsersTableSeeder extends Seeder
             'password' => \Illuminate\Support\Facades\Hash::make('password'),
             'api_token' => \Illuminate\Support\Str::random(60)
         ]);
+        \App\User::create([
+            'name' => 'Alex',
+            'email' => 'bog@ram1.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            'api_token' => \Illuminate\Support\Str::random(60)
+        ]);
     }
 }

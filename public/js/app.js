@@ -59367,7 +59367,11 @@ var app = new Vue({
       }
   },*/
   created: function created() {
-    this.fetchMessages(); //read message data from pusher if we need to read message from pusher
+    var _this = this;
+
+    this.interval = setInterval(function () {
+      return _this.fetchMessages();
+    }, 2000); //read message data from pusher if we need to read message from pusher
     //but now we reed message from our local db in fetchMessages()
 
     /*
@@ -59379,14 +59383,14 @@ var app = new Vue({
        });
     });
     */
+    //get message from pusher -> PP define in bootstrap.js
 
     /*
-    //get message from pusher -> PP define in bootstrap.js
     var self = this;
     var channel = PP.subscribe('private-chat');
     channel.bind('my-event', function(data) {
         let param = JSON.stringify(data);
-        self.messages.push({
+          self.messages.push({
             message: param.message,
             user: {name:'test'}
         })
@@ -59412,20 +59416,22 @@ var app = new Vue({
   },*/
   methods: {
     fetchMessages: function fetchMessages() {
-      var _this = this;
+      var _this2 = this;
 
       axios.get('/messages').then(function (response) {
-        _this.messages = response.data;
+        _this2.messages = response.data;
       });
     },
     addMessage: function addMessage(message) {
-      var isDelete = false;
+      if (this.messages.length > 4) {
+        var isDelete = false;
 
-      for (var key in this.messages) {
-        if (this.messages.hasOwnProperty(key) && !isDelete) {
-          // console.log(key + " -> " + this.messages[key]);
-          this.messages.splice(key, 1);
-          isDelete = true;
+        for (var key in this.messages) {
+          if (this.messages.hasOwnProperty(key) && !isDelete) {
+            // console.log(key + " -> " + this.messages[key]);
+            this.messages.splice(key, 1);
+            isDelete = true;
+          }
         }
       }
 

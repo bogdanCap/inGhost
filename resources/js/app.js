@@ -59,7 +59,9 @@ const app = new Vue({
     },*/
 
     created() {
-        this.fetchMessages();
+
+        this.interval = setInterval(() => this.fetchMessages(), 2000);
+
         //read message data from pusher if we need to read message from pusher
         //but now we reed message from our local db in fetchMessages()
          /*
@@ -71,18 +73,22 @@ const app = new Vue({
             });
          });
          */
-        /*
+
         //get message from pusher -> PP define in bootstrap.js
+        /*
         var self = this;
         var channel = PP.subscribe('private-chat');
         channel.bind('my-event', function(data) {
             let param = JSON.stringify(data);
+
+
             self.messages.push({
                 message: param.message,
                 user: {name:'test'}
             })
         });
         */
+
 
 
     },
@@ -113,12 +119,14 @@ const app = new Vue({
         },
 
         addMessage(message) {
-            let isDelete = false;
-            for (var key in this.messages) {
-                if (this.messages.hasOwnProperty(key) && !isDelete) {
-                    // console.log(key + " -> " + this.messages[key]);
-                    this.messages.splice(key, 1);
-                    isDelete = true;
+            if(this.messages.length > 4) {
+                let isDelete = false;
+                for (var key in this.messages) {
+                    if (this.messages.hasOwnProperty(key) && !isDelete) {
+                        // console.log(key + " -> " + this.messages[key]);
+                        this.messages.splice(key, 1);
+                        isDelete = true;
+                    }
                 }
             }
 
