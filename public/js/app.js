@@ -59347,6 +59347,25 @@ var app = new Vue({
   data: {
     messages: []
   },
+
+  /*
+  watch: {
+      messages: {
+          handler: function (after, before) {
+              // Return the object that changed
+               let changed = after.filter( function( p, idx ) {
+                  return Object.keys(p).some( function( prop ) {
+                      return p[prop] !== before[idx][prop];
+                  })
+              })
+               //this.before.splice(this.before.indexOf(event), 1);
+              // Log it
+              console.log(changed);
+              console.log("---------------");
+          },
+          deep: true
+      }
+  },*/
   created: function created() {
     this.fetchMessages(); //read message data from pusher if we need to read message from pusher
     //but now we reed message from our local db in fetchMessages()
@@ -59374,6 +59393,23 @@ var app = new Vue({
     });
     */
   },
+
+  /*
+  mounted: function () {
+      this.$watch('messages', function () {
+          console.log('a thing changed');
+          console.log(this.messages);
+          let isDelete = false;
+          for (var key in this.messages) {
+              if (this.messages.hasOwnProperty(key) && !isDelete) {
+                 // console.log(key + " -> " + this.messages[key]);
+                  this.messages.splice(key, 1);
+                  isDelete = true;
+              }
+          }
+           //this.$delete(this.messages, index);
+       }, {deep:true})
+  },*/
   methods: {
     fetchMessages: function fetchMessages() {
       var _this = this;
@@ -59383,6 +59419,16 @@ var app = new Vue({
       });
     },
     addMessage: function addMessage(message) {
+      var isDelete = false;
+
+      for (var key in this.messages) {
+        if (this.messages.hasOwnProperty(key) && !isDelete) {
+          // console.log(key + " -> " + this.messages[key]);
+          this.messages.splice(key, 1);
+          isDelete = true;
+        }
+      }
+
       this.messages.push(message);
       axios.post('/messages', message).then(function (response) {
         console.log(response.data);
@@ -59464,6 +59510,7 @@ window.Echo = new Echo({
     encrypted: true
 });
 */
+//Pusher initialization
 
 window.PP = new Pusher('7436ac433543c98e4543', {
   authEndpoint: '/chat/auth',

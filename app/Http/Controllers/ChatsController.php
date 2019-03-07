@@ -33,7 +33,13 @@ class ChatsController extends Controller
      */
     public function fetchMessages()
     {
-        return MessageBrodcast::with('user')->orderBy('id', 'desc')->take(5)->get();
+        $messages = MessageBrodcast::with('user')->orderBy('id', 'desc')->take(5)->get()->toArray();
+        //sort result
+        usort($messages, function($a, $b) {
+            return $a['id'] <=> $b['id'];
+        });
+
+        return response()->json($messages);
     }
 
     /**
