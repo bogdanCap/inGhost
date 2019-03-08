@@ -62,6 +62,7 @@ class ChatsController extends Controller
         );
         //add message into pusher need only if we need to retrive message from pusher in front
         $data['message'] = $request->get('message');
+        $data['user'] = $user;
         $pusher->trigger('private-chat', 'my-event', $data);
 
         return ['status' => 'Message Sent!'];

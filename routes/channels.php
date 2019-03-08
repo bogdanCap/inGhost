@@ -17,6 +17,9 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
 
 //chat broadcast routes
 Broadcast::channel('chat', function ($user) {
-    return Auth::check();
+    //return Auth::check();
+    return [
+        'user' => $user
+    ];
 });
 
