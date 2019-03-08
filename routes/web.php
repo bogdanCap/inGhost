@@ -20,9 +20,11 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 //chat routes
-Route::get('/chatHome', 'ChatsController@index');
-Route::get('messages', 'ChatsController@fetchMessages');
-Route::post('messages', 'ChatsController@sendMessage');
-Route::post('/chat/auth', 'ChatsController@pusherAuth');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chat', 'ChatsController@index');
+    Route::get('messages', 'ChatsController@fetchMessages');
+    Route::post('messages', 'ChatsController@sendMessage');
+    Route::post('/chat/auth', 'ChatsController@pusherAuth');
+});
 
 

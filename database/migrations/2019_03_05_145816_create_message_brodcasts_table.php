@@ -15,8 +15,10 @@ class CreateMessageBrodcastsTable extends Migration
     {
         Schema::create('message_brodcasts', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('user_id')->unsigned();
             $table->text('message');
+            $table->unsignedBigInteger('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('parent_user_id')->default(null);
             $table->timestamps();
         });
     }
