@@ -18,7 +18,7 @@ class CreateMessageBrodcastsTable extends Migration
             $table->text('message');
             $table->unsignedBigInteger('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unsignedBigInteger('parent_user_id')->default(null);
+            $table->unsignedBigInteger('parent_user_id')->nullable();
             $table->timestamps();
         });
     }
