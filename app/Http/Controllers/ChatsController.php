@@ -31,6 +31,14 @@ class ChatsController extends Controller
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getOnlineUsers()
+    {
+        return response()->json(ChatServiceFacade::getActiveUsers());
+    }
+
+    /**
      * @param Request $request
      * @return array
      */

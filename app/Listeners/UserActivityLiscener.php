@@ -18,7 +18,7 @@ class UserActivityLiscener
     public function handle(UserActivity $event)
     {
         // Access the order using $event->order...
-        $event->user->last_activity = date ("Y-m-d H:i:s", time());;
+        $event->user->last_activity = date ("Y-m-d H:i:s", time());
         $event->user->save();
     }
 }

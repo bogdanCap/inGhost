@@ -30,17 +30,30 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 
 Vue.component('chat-messages', require('./components/ChatMessages.vue').default);
 Vue.component('chat-form', require('./components/ChatForm.vue').default);
+Vue.component('users-list', require('./components/OnlineUsersList.vue').default);
+
 
 const app = new Vue({
     el: '#app',
 
     data: {
-        messages: []
+        messages: [],
+        chatUsers: [],
+        toUser: []
     },
     created() {
 
+
+        //get user online list
+        this.getOnlineUsers();
+     //   this.interval = setInterval(() => this.getOnlineUsers(), 10000);
+
+
         //this.interval = setInterval(() => this.fetchMessages(), 2000);
         this.fetchMessages();
+
+
+
         //read message data from pusher if we need to read message from pusher
         //but now we reed message from our local db in fetchMessages()
          /*
@@ -82,6 +95,11 @@ const app = new Vue({
                 this.messages = response.data;
             });
         },
+        getOnlineUsers() {
+            axios.get('/activeUsers').then(response => {
+                this.chatUsers = response.data;
+            });
+        },
         addMessage(message) {
             //display only 5 message
 
@@ -97,7 +115,13 @@ const app = new Vue({
 
             axios.post('/messages', message).then(response => {
                 console.log(response.data);
+                //reset selected user
+                this.toUser = [];
             });
+        },
+        //save user wich we will send message
+        sendPrivateMessage(user) {
+            this.toUser = user.data;
         }
     }
 });

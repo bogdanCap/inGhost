@@ -3,6 +3,8 @@
 namespace App\Http\Service;
 
 use App\MessageBrodcast;
+use App\User;
+use Illuminate\Support\Facades\Auth;
 
 class ChatService {
 
@@ -15,5 +17,21 @@ class ChatService {
         });
 
         return $messages;
+    }
+
+    public function getActiveUsers()
+    {
+        $userId = Auth::user()->getAuthIdentifier();
+        $date = date ("Y-m-d H:i:s", time());
+        $currentDate = strtotime($date);
+        $futureDate = $currentDate-(60*5);
+        $formatDate = date("Y-m-d H:i:s", $futureDate);
+
+        return User::where([
+            ['last_activity','>', $formatDate],
+            //['id', '!=', $userId]
+        ])
+            ->get()
+            ->toArray();
     }
 }

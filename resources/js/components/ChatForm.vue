@@ -12,7 +12,7 @@
 
 <script>
     export default {
-        props: ['user'],
+        props: ['user', 'toUser'],
 
         data() {
             return {
@@ -22,9 +22,11 @@
 
         methods: {
             sendMessage() {
+
                 this.$emit('messagesent', {
                     user: this.user,
-                    message: this.newMessage
+                    message: this.newMessage,
+                    toUser: this.toUser
                 });
 
                 this.newMessage = ''
