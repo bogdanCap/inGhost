@@ -37,27 +37,6 @@ const app = new Vue({
     data: {
         messages: []
     },
-    /*
-    watch: {
-        messages: {
-            handler: function (after, before) {
-                // Return the object that changed
-
-                let changed = after.filter( function( p, idx ) {
-                    return Object.keys(p).some( function( prop ) {
-                        return p[prop] !== before[idx][prop];
-                    })
-                })
-
-                //this.before.splice(this.before.indexOf(event), 1);
-                // Log it
-                console.log(changed);
-                console.log("---------------");
-            },
-            deep: true
-        }
-    },*/
-
     created() {
 
         //this.interval = setInterval(() => this.fetchMessages(), 2000);
@@ -80,7 +59,6 @@ const app = new Vue({
         var channel = PP.subscribe('private-chat');
         channel.bind('my-event', function(data) {
             //display only 5 message
-
             if(self.messages.length > 4) {
                 let isDelete = false;
                 for (var key in self.messages) {
@@ -91,37 +69,12 @@ const app = new Vue({
                     }
                 }
             }
-
-
-
             self.messages.push({
                 message: data.message,
                 user:{name:data.user.name}
             });
         });
-
-
-
-
     },
-    /*
-    mounted: function () {
-        this.$watch('messages', function () {
-            console.log('a thing changed');
-            console.log(this.messages);
-            let isDelete = false;
-            for (var key in this.messages) {
-                if (this.messages.hasOwnProperty(key) && !isDelete) {
-                   // console.log(key + " -> " + this.messages[key]);
-                    this.messages.splice(key, 1);
-                    isDelete = true;
-                }
-            }
-
-            //this.$delete(this.messages, index);
-
-        }, {deep:true})
-    },*/
 
     methods: {
         fetchMessages() {
@@ -136,7 +89,6 @@ const app = new Vue({
                 let isDelete = false;
                 for (var key in this.messages) {
                     if (this.messages.hasOwnProperty(key) && !isDelete) {
-                        // console.log(key + " -> " + this.messages[key]);
                         this.messages.splice(key, 1);
                         isDelete = true;
                     }

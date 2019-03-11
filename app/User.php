@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\ChatSessionGroup;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -42,5 +43,13 @@ class User extends Authenticatable
     public function messages()
     {
         return $this->hasMany(MessageBrodcast::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function sessionGroup()
+    {
+        return $this->hasMany(ChatSessionGroup::class);
     }
 }

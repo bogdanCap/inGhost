@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateMessageBrodcastsTable extends Migration
+class CreateChatSessionGroupTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,9 @@ class CreateMessageBrodcastsTable extends Migration
      */
     public function up()
     {
-        Schema::create('message_brodcasts', function (Blueprint $table) {
+        Schema::create('chat_session_groups', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->text('message');
-            $table->unsignedBigInteger('user_id')->unsigned()->index();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unsignedBigInteger('parent_user_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('chat_session_id')->nullable();
             $table->timestamps();
         });
@@ -31,6 +28,6 @@ class CreateMessageBrodcastsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('message_brodcasts');
+        Schema::dropIfExists('chat_session_groups');
     }
 }
