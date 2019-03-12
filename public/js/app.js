@@ -1885,13 +1885,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['chatUsers'],
+  data: function data() {
+    return {
+      activeItemId: ''
+    };
+  },
   methods: {
     privateUser: function privateUser(user) {
       this.$emit('touser', {
         data: user
       });
+    },
+    setActiveItemId: function setActiveItemId(itemIndex) {
+      this.activeItemId = itemIndex;
     }
   },
   mounted: function mounted() {// Do something useful with the data in the template
@@ -47263,17 +47274,18 @@ var render = function() {
   return _c(
     "ul",
     { staticClass: "chat" },
-    _vm._l(_vm.chatUsers, function(onlineUser) {
+    _vm._l(_vm.chatUsers, function(onlineUser, itemIndex) {
       return _c("li", { staticClass: "left clearfix" }, [
         _c("div", { staticClass: "chat-body clearfix" }, [
           _c(
             "div",
             {
               staticClass: "header",
+              class: { selectedUser: _vm.activeItemId === itemIndex },
               staticStyle: { cursor: "pointer" },
               on: {
                 click: function($event) {
-                  return _vm.privateUser(onlineUser)
+                  _vm.privateUser(onlineUser), _vm.setActiveItemId(itemIndex)
                 }
               }
             },

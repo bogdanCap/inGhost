@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-md-8">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Chats</div>
+                    <div class="panel-heading headerBorder">Chats</div>
 
                     <div class="panel-body">
                         <chat-messages :messages="messages"></chat-messages>
@@ -21,7 +21,7 @@
             </div>
             <div class="col-md-4">
                 <div class="panel panel-default">
-                    <div class="panel-heading">User online</div>
+                    <div class="panel-heading headerBorder">User online</div>
 
                     <div class="panel-body">
                         <users-list v-on:touser="sendPrivateMessage" :chat-users="chatUsers"></users-list>

@@ -1,8 +1,12 @@
 <template>
     <ul class="chat">
-        <li class="left clearfix" v-for="onlineUser in chatUsers">
+        <li class="left clearfix" v-for="(onlineUser, itemIndex) in chatUsers">
             <div class="chat-body clearfix">
-                <div style="2px solid white;cursor:pointer"  @click="privateUser(onlineUser)" class="header">
+                <div
+                   style="2px solid white;cursor:pointer"
+                   :class="{'selectedUser': activeItemId === itemIndex}"
+                   @click="privateUser(onlineUser), setActiveItemId(itemIndex)" class="header"
+                >
                     <strong class="primary-font">
                         {{ onlineUser.name }}
                     </strong>
@@ -16,15 +20,21 @@
 <script>
   export default {
       props: ['chatUsers'],
-
+      data: function () {
+        return {
+         activeItemId: ''
+        }
+      },
 
       methods: {
            privateUser(user) {
                this.$emit('touser', {
                     data: user,
                });
-
            },
+           setActiveItemId(itemIndex) {
+               this.activeItemId = itemIndex;
+           }
       },
 
       mounted () {
