@@ -27,4 +27,12 @@ class MessageBrodcast extends Model
     {
         return $this->belongsTo(ChatSession::class);
     }
+
+    /**
+     * @return string|null
+     */
+    public function getParentUserId()
+    {
+        return $this->parent_user_id;
+    }
 }

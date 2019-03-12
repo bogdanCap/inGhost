@@ -39,13 +39,19 @@ const app = new Vue({
     data: {
         messages: [],
         chatUsers: [],
-        toUser: []
+        toUser: [],
+        isFirst: false,
     },
     created() {
 
 
         //get user online list
-        this.getOnlineUsers();
+        if (!this.isFirst) {
+            this.getOnlineUsers();
+            this.isFirst = true;
+        } else {
+            this.interval = setInterval(() => this.getOnlineUsers(), 10000);
+        }
      //   this.interval = setInterval(() => this.getOnlineUsers(), 10000);
 
 
@@ -54,17 +60,7 @@ const app = new Vue({
 
 
 
-        //read message data from pusher if we need to read message from pusher
-        //but now we reed message from our local db in fetchMessages()
-         /*
-         Echo.private('private-chat')
-         .listen('my-event', (e) => {
-             this.messages.push({
-                 message: e.message.message,
-                 user: e.user
-            });
-         });
-         */
+
 
         //get message from pusher -> PP define in bootstrap.js
         //live message updating
@@ -76,15 +72,25 @@ const app = new Vue({
                 let isDelete = false;
                 for (var key in self.messages) {
                     if (self.messages.hasOwnProperty(key) && !isDelete) {
-                        // console.log(key + " -> " + this.messages[key]);
                         self.messages.splice(key, 1);
                         isDelete = true;
                     }
                 }
             }
+            let toUser = {};
+            //private message check
+            if(data.parent_user_id !== 'undefined') {
+                toUser = data.parent_user_id;
+            }
+            
             self.messages.push({
-                message: data.message,
-                user:{name:data.user.name}
+                message: data.message.message,
+                user:{
+                    name:data.user.name,
+                    id: data.user.id
+                },
+                parent_user_id: toUser,
+                user_id: data.message.user_id
             });
         });
     },
@@ -92,7 +98,7 @@ const app = new Vue({
     methods: {
         fetchMessages() {
             axios.get('/messages').then(response => {
-                this.messages = response.data;
+                this.messages = response.data.message;
             });
         },
         getOnlineUsers() {

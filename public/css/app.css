@@ -9,6 +9,10 @@
   background-color: bisque;
 }
 
+.message.private.notMy {
+  border-bottom: 2px solid brown;
+}
+
 .chat {
   list-style: none;
   margin: 0;

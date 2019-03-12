@@ -7,9 +7,10 @@
                         {{ message.user.name }}
                     </strong>
                 </div>
-                <p>
+                <p :class="['message', (message.parent_user_id !== null ? 'private' : ''), (message.user_id !== user.id ? 'notMy' : '')]"  >
                     {{ message.message }}
                 </p>
+
             </div>
         </li>
     </ul>
@@ -17,6 +18,7 @@
 
 <script>
   export default {
-    props: ['messages']
+    props: ['messages', 'user'],
+
   };
 </script>

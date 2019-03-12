@@ -1822,8 +1822,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['messages']
+  props: ['messages', 'user']
 });
 
 /***/ }),
@@ -1870,6 +1871,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
 //
 //
 //
@@ -47191,11 +47193,23 @@ var render = function() {
             ])
           ]),
           _vm._v(" "),
-          _c("p", [
-            _vm._v(
-              "\n                " + _vm._s(message.message) + "\n            "
-            )
-          ])
+          _c(
+            "p",
+            {
+              class: [
+                "message",
+                message.parent_user_id !== null ? "private" : "",
+                message.user_id !== _vm.user.id ? "notMy" : ""
+              ]
+            },
+            [
+              _vm._v(
+                "\n                " +
+                  _vm._s(message.message) +
+                  "\n            "
+              )
+            ]
+          )
         ])
       ])
     }),
@@ -59456,26 +59470,25 @@ var app = new Vue({
   data: {
     messages: [],
     chatUsers: [],
-    toUser: []
+    toUser: [],
+    isFirst: false
   },
   created: function created() {
+    var _this = this;
+
     //get user online list
-    this.getOnlineUsers(); //   this.interval = setInterval(() => this.getOnlineUsers(), 10000);
+    if (!this.isFirst) {
+      this.getOnlineUsers();
+      this.isFirst = true;
+    } else {
+      this.interval = setInterval(function () {
+        return _this.getOnlineUsers();
+      }, 10000);
+    } //   this.interval = setInterval(() => this.getOnlineUsers(), 10000);
     //this.interval = setInterval(() => this.fetchMessages(), 2000);
 
-    this.fetchMessages(); //read message data from pusher if we need to read message from pusher
-    //but now we reed message from our local db in fetchMessages()
 
-    /*
-    Echo.private('private-chat')
-    .listen('my-event', (e) => {
-        this.messages.push({
-            message: e.message.message,
-            user: e.user
-       });
-    });
-    */
-    //get message from pusher -> PP define in bootstrap.js
+    this.fetchMessages(); //get message from pusher -> PP define in bootstrap.js
     //live message updating
 
     var self = this;
@@ -59487,38 +59500,48 @@ var app = new Vue({
 
         for (var key in self.messages) {
           if (self.messages.hasOwnProperty(key) && !isDelete) {
-            // console.log(key + " -> " + this.messages[key]);
             self.messages.splice(key, 1);
             isDelete = true;
           }
         }
       }
 
+      var toUser = {}; //private message check
+
+      if (data.parent_user_id !== 'undefined') {
+        toUser = data.parent_user_id;
+      } //   console.log(data.message);
+      //   console.log(data.messageEntity.user_id);
+
+
       self.messages.push({
-        message: data.message,
+        message: data.message.message,
         user: {
-          name: data.user.name
-        }
+          name: data.user.name,
+          id: data.user.id
+        },
+        parent_user_id: toUser,
+        user_id: data.message.user_id
       });
     });
   },
   methods: {
     fetchMessages: function fetchMessages() {
-      var _this = this;
+      var _this2 = this;
 
       axios.get('/messages').then(function (response) {
-        _this.messages = response.data;
+        _this2.messages = response.data.message;
       });
     },
     getOnlineUsers: function getOnlineUsers() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.get('/activeUsers').then(function (response) {
-        _this2.chatUsers = response.data;
+        _this3.chatUsers = response.data;
       });
     },
     addMessage: function addMessage(message) {
-      var _this3 = this;
+      var _this4 = this;
 
       //display only 5 message
       if (this.messages.length > 4) {
@@ -59535,7 +59558,7 @@ var app = new Vue({
       axios.post('/messages', message).then(function (response) {
         console.log(response.data); //reset selected user
 
-        _this3.toUser = [];
+        _this4.toUser = [];
       });
     },
     //save user wich we will send message

@@ -27,7 +27,9 @@ class ChatsController extends Controller
      */
     public function fetchMessages()
     {
-        return response()->json(ChatServiceFacade::getPublicMessages());
+        return response()->json([
+            'message' => ChatServiceFacade::getPublicMessages(),
+        ]);
     }
 
     /**
@@ -52,6 +54,41 @@ class ChatsController extends Controller
             'message' => $request->input('message')
         ]);
 
+        $toUser = $request->input('toUser');
+        $messageTo = '';
+        if (isset($toUser['id'])) {
+            /** @var User $messageTo */
+            $messageTo = User::find($toUser['id']);
+            $message->parent_user_id = $messageTo->getId();
+            $message->save();
+
+
+
+            // session -> this is for private chat room
+            //create chat session for private messages
+            //assign user to sessionGroup - if chat more than 1 person
+            $sessionGroup1 = $user->sessionGroup()->create([]);
+            $sessionGroup2 = $messageTo->sessionGroup()->create([]);
+
+
+            //create chat session
+            //session need only if more than 1 person is chat
+            $chatSession = new \App\Models\ChatSession();
+            $chatSession->session_name = 'test_session_name';
+            $chatSession->session_hash = str_random(50);
+            $chatSession->save();
+            //assign chatSession to message and to user
+            $chatSession->messages()->save($message);
+
+
+            $chatSession->sessionGroup()->save($sessionGroup1);
+            $chatSession->sessionGroup()->save($sessionGroup2);
+        }
+
+
+
+
+
         broadcast(new MessageSent($user, $message))->toOthers();
 
         $appId = env('PUSHER_APP_ID');
@@ -69,8 +106,11 @@ class ChatsController extends Controller
             $options
         );
         //add message into pusher need only if we need to retrive message from pusher in front
-        $data['message'] = $request->get('message');
+        $data['message'] = $message;
         $data['user'] = $user;
+        //is message private
+        $data['parent_user_id'] = $message->getParentUserId();
+
         $pusher->trigger('private-chat', 'my-event', $data);
 
         return ['status' => 'Message Sent!'];
