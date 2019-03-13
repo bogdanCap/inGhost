@@ -40,58 +40,31 @@ const app = new Vue({
         messages: [],
         chatUsers: [],
         toUser: [],
-        isFirst: false,
+        publicChannel: 'private-chat',
+        channels: [],
+    },
+    mounted() {
+
     },
     created() {
-
-
         //get user online list
-        if (!this.isFirst) {
-            this.getOnlineUsers();
-            this.isFirst = true;
-        } else {
-            this.interval = setInterval(() => this.getOnlineUsers(), 10000);
-        }
-     //   this.interval = setInterval(() => this.getOnlineUsers(), 10000);
-
-
-        //this.interval = setInterval(() => this.fetchMessages(), 2000);
+        this.getOnlineUsers();
+        //check online users
+        this.interval = setInterval(() => this.getOnlineUsers(), 20000);
+        //get message from db
         this.fetchMessages();
-
-
-
-
-
-        //get message from pusher -> PP define in bootstrap.js
-        //live message updating
-        var self = this;
-        var channel = PP.subscribe('private-chat');
-        channel.bind('my-event', function(data) {
-            //display only 5 message
-            if(self.messages.length > 4) {
-                let isDelete = false;
-                for (var key in self.messages) {
-                    if (self.messages.hasOwnProperty(key) && !isDelete) {
-                        self.messages.splice(key, 1);
-                        isDelete = true;
-                    }
-                }
+        //get channels list
+        this.getChannelList().then(response => {
+            var self = this;
+            var privateChannel = response.data.channels;
+            self.channels.push(self.publicChannel);
+            if(privateChannel.length > 0) {
+                privateChannel.forEach(function(chatSession) {
+                    self.channels.push(self.publicChannel+chatSession);
+                });
             }
-            let toUser = {};
-            //private message check
-            if(data.parent_user_id !== 'undefined') {
-                toUser = data.parent_user_id;
-            }
-            
-            self.messages.push({
-                message: data.message.message,
-                user:{
-                    name:data.user.name,
-                    id: data.user.id
-                },
-                parent_user_id: toUser,
-                user_id: data.message.user_id
-            });
+            //listening socket channels
+            this.updateSocketMessage(self.channels);
         });
     },
 
@@ -108,7 +81,6 @@ const app = new Vue({
         },
         addMessage(message) {
             //display only 5 message
-
             if(this.messages.length > 4) {
                 let isDelete = false;
                 for (var key in this.messages) {
@@ -118,16 +90,51 @@ const app = new Vue({
                     }
                 }
             }
-
+            var self = this;
             axios.post('/messages', message).then(response => {
-                console.log(response.data);
                 //reset selected user
                 this.toUser = [];
             });
         },
+        getChannelList() {
+            return axios.get('/channel/list');
+        },
         //save user wich we will send message
         sendPrivateMessage(user) {
             this.toUser = user.data;
+        },
+        updateSocketMessage(channels) {
+            var self = this;
+            //listening all channels
+            channels.forEach(function(channel) {
+                var pusher = PP.subscribe(channel);
+                pusher.bind('my-event', function(data) {
+                    //display only 5 message
+                    if(self.messages.length > 4) {
+                        let isDelete = false;
+                        for (var key in self.messages) {
+                            if (self.messages.hasOwnProperty(key) && !isDelete) {
+                                self.messages.splice(key, 1);
+                                isDelete = true;
+                            }
+                        }
+                    }
+                    let toUser = {};
+                    //private message check
+                    if(data.parent_user_id !== 'undefined') {
+                        toUser = data.parent_user_id;
+                    }
+                    self.messages.push({
+                        message: data.message.message,
+                        user:{
+                            name:data.user.name,
+                            id: data.user.id
+                        },
+                        parent_user_id: toUser,
+                        user_id: data.message.user_id
+                    });
+                });
+            });
         }
     }
 });

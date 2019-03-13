@@ -24,6 +24,7 @@ Route::middleware(['auth', 'userActivity'])->group(function () {
     Route::get('/chat', 'ChatsController@index');
     Route::get('/messages', 'ChatsController@fetchMessages');
     Route::get('/activeUsers', 'ChatsController@getOnlineUsers');
+    Route::get('/channel/list', 'ChatsController@getUserChatSession');
     Route::post('/messages', 'ChatsController@sendMessage');
     Route::post('/chat/auth', 'ChatsController@pusherAuth');
 });

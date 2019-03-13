@@ -16,12 +16,11 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
 });
 
 //chat broadcast routes
-Broadcast::channel('chat', function ($user) {
-    //return Auth::check();
-    return [
-        'user' => $user
-    ];
-});
+//Broadcast::channel('chat', function ($user) {
+    //return [
+    //    'user' => $user,
+    //];
+//});
 
 /*
 Broadcast::channel('Chat.{session}', function ($user, Session $session) {
@@ -30,5 +29,16 @@ Broadcast::channel('Chat.{session}', function ($user, Session $session) {
     }
     return false;
 });
+
+
+public function broadcastOn()
+{
+    return new PrivateChannel('order.'.$this->update->order_id);
+}
+
+Broadcast::channel('order.{orderId}', function ($user, $orderId) {
+    return $user->id === Order::findOrNew($orderId)->user_id;
+});
+
 */
 

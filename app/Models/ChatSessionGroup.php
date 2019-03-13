@@ -24,4 +24,9 @@ class ChatSessionGroup extends Model
     {
         return $this->belongsTo(User::class);
     }
+    
+    public function getChatSessionId()
+    {
+        return $this->chat_session_id;
+    }
 }

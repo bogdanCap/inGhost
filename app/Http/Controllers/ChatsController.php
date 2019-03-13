@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Events\MessageSent;
 use App\Http\Facades\ChatServiceFacade;
 use App\MessageBrodcast;
+use App\Models\ChatSession;
+use App\Models\ChatSessionGroup;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +39,7 @@ class ChatsController extends Controller
      */
     public function getOnlineUsers()
     {
-        return response()->json(ChatServiceFacade::getActiveUsers());
+        return response()->json(ChatServiceFacade::getActiveUsers(true));
     }
 
     /**
@@ -56,6 +58,7 @@ class ChatsController extends Controller
 
         $toUser = $request->input('toUser');
         $messageTo = '';
+
         if (isset($toUser['id'])) {
             /** @var User $messageTo */
             $messageTo = User::find($toUser['id']);
@@ -67,29 +70,47 @@ class ChatsController extends Controller
             // session -> this is for private chat room
             //create chat session for private messages
             //assign user to sessionGroup - if chat more than 1 person
-            $sessionGroup1 = $user->sessionGroup()->create([]);
-            $sessionGroup2 = $messageTo->sessionGroup()->create([]);
+            /*
+            $chatsSessionGroup = ChatSessionGroup::whereIn('user_id', [$user->getId(), $messageTo->getId()])->first();
 
 
-            //create chat session
-            //session need only if more than 1 person is chat
-            $chatSession = new \App\Models\ChatSession();
-            $chatSession->session_name = 'test_session_name';
-            $chatSession->session_hash = str_random(50);
-            $chatSession->save();
-            //assign chatSession to message and to user
-            $chatSession->messages()->save($message);
+            if(!$chatsSessionGroup) {
+                $sessionGroup1 = $user->sessionGroup()->create([]);
+                $sessionGroup2 = $messageTo->sessionGroup()->create([]);
+
+                //create chat session
+                //session need only if more than 1 person is chat
+                $chatSession = new \App\Models\ChatSession();
+                $chatSession->session_name = 'test_session_name';
+                $chatSession->session_hash = str_random(50);
+                $chatSession->save();
+                //assign chatSession to message and to user
+                $chatSession->messages()->save($message);
 
 
-            $chatSession->sessionGroup()->save($sessionGroup1);
-            $chatSession->sessionGroup()->save($sessionGroup2);
+                $chatSession->sessionGroup()->save($sessionGroup1);
+                $chatSession->sessionGroup()->save($sessionGroup2);
+            } else {
+                $chatSession = ChatSession::find($chatsSessionGroup->getChatSessionId());
+            }
+            */
+
+
+
+
+           // $messageTo->getId()
+            $channel = 'private-chat'.$messageTo->getId();
+        } else {
+            $channel = 'private-chat';
         }
 
+        //need to understand this line
+      //  broadcast(new MessageSent($user, $message))->toOthers();
+    //    event(new MessageSent($user, $message));
+        
+        
 
-
-
-
-        broadcast(new MessageSent($user, $message))->toOthers();
+        
 
         $appId = env('PUSHER_APP_ID');
         $appKey = env('PUSHER_APP_KEY');
@@ -111,9 +132,11 @@ class ChatsController extends Controller
         //is message private
         $data['parent_user_id'] = $message->getParentUserId();
 
-        $pusher->trigger('private-chat', 'my-event', $data);
+        $pusher->trigger($channel, 'my-event', $data);
 
-        return ['status' => 'Message Sent!'];
+        return [
+            'status' => 'Message Sent!',
+        ];
     }
 
     /**
@@ -141,5 +164,28 @@ class ChatsController extends Controller
         $data['message'] = $request->get('message');
         $presence_data = array('name' => $user->getAuthIdentifierName().'test');
         echo $pusher->presence_auth($_POST['channel_name'], $_POST['socket_id'], $user->getAuthIdentifier(), $presence_data);
+    }
+    
+    public function getUserChatSession()
+    {
+        /** @var User $user */
+     //   $user = Auth::user();
+        /*
+        $chatsSessionGroup = ChatSessionGroup::where('user_id', '=', $user->getId())->get();
+        $chatSession = ($chatsSessionGroup) ? $chatsSessionGroup->toArray() : [];
+        $chatSession = array_map(function ($a) {
+            return $a['chat_session_id'];
+        }, $chatSession);
+        */
+
+        $activeUser = ChatServiceFacade::getActiveUsers();
+
+        //$chatsSessionGroup = User::where('user_id', '=', $user->getId())->get();
+        //$chatSession = ($chatsSessionGroup) ? $chatsSessionGroup->toArray() : [];
+        $activeUser = array_map(function ($a) {
+            return $a['id'];
+        }, $activeUser);
+        
+        return response()->json(['channels' => $activeUser]);
     }
 }

@@ -26,4 +26,12 @@ class ChatSession extends Model
     {
         return $this->hasMany(ChatSessionGroup::class);
     }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 }

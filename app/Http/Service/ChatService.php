@@ -19,19 +19,33 @@ class ChatService {
         return $messages;
     }
 
-    public function getActiveUsers()
+    /**
+     * @param bool $notMe
+     * @return mixed
+     */
+    public function getActiveUsers(bool $notMe = false)
     {
         $userId = Auth::user()->getAuthIdentifier();
         $date = date ("Y-m-d H:i:s", time());
         $currentDate = strtotime($date);
         $futureDate = $currentDate-(60*5);
         $formatDate = date("Y-m-d H:i:s", $futureDate);
-
-        return User::where([
-            ['last_activity','>', $formatDate],
-            //['id', '!=', $userId]
-        ])
-            ->get()
-            ->toArray();
+        if (!$notMe) {
+            return User::where([
+                ['last_activity', '>', $formatDate],
+                //['id', '!=', $userId]
+            ])
+                ->get()
+                ->toArray();
+        } else {
+            return User::where([
+                /*
+                ['last_activity', '>', $formatDate],
+                ['last_activity', '<', $formatDate],*/
+                ['id', '!=', $userId]
+            ])->whereBetween('last_activity', [$formatDate, $date])
+                ->get()
+                ->toArray();
+        }
     }
 }
