@@ -136,6 +136,7 @@ class ChatsController extends Controller
 
         return [
             'status' => 'Message Sent!',
+            'chatChannel' => $channel
         ];
     }
 
@@ -169,7 +170,7 @@ class ChatsController extends Controller
     public function getUserChatSession()
     {
         /** @var User $user */
-     //   $user = Auth::user();
+        $user = Auth::user();
         /*
         $chatsSessionGroup = ChatSessionGroup::where('user_id', '=', $user->getId())->get();
         $chatSession = ($chatsSessionGroup) ? $chatsSessionGroup->toArray() : [];
@@ -185,7 +186,13 @@ class ChatsController extends Controller
         $activeUser = array_map(function ($a) {
             return $a['id'];
         }, $activeUser);
+
+      //  var_dump([$activeUser, $user->getAuthIdentifier()]);
+      //  die();
         
-        return response()->json(['channels' => $activeUser]);
+        //return response()->json(['channels' => $activeUser]);
+
+        return response()->json(['channels' => [$user->getAuthIdentifier()]]);
+
     }
 }

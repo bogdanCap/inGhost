@@ -91,6 +91,23 @@ const app = new Vue({
                 }
             }
             var self = this;
+
+            let toUser = {};
+            if(typeof message.toUser.id !== 'undefined') {
+                //display a private message for user who sent it
+                toUser = message.toUser.id;
+                self.messages.push({
+                    message: message.message,
+                    user:{
+                        name:message.user.name,
+                        id: message.user.id
+                    },
+                    parent_user_id: toUser,
+                    user_id: message.user.id
+                });
+
+            }
+
             axios.post('/messages', message).then(response => {
                 //reset selected user
                 this.toUser = [];

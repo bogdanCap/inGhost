@@ -10,7 +10,16 @@ class ChatService {
 
     public function getPublicMessages()
     {
-        $messages = MessageBrodcast::with('user')->orderBy('id', 'desc')->take(5)->get()->toArray();
+        $userId = Auth::user()->getAuthIdentifier();
+        $messages = MessageBrodcast::with('user')
+           // ->where('parent_user_id', '=', $userId)
+            ->where('parent_user_id', '=', null)
+            ->orWhere('user_id', '=', $userId)
+            ->orWhere('parent_user_id', '=', $userId)
+            ->orderBy('id', 'desc')
+            ->take(5)
+            ->get()
+            ->toArray();
         //sort result
         usort($messages, function($a, $b) {
             return $a['id'] <=> $b['id'];
@@ -32,9 +41,9 @@ class ChatService {
         $formatDate = date("Y-m-d H:i:s", $futureDate);
         if (!$notMe) {
             return User::where([
-                ['last_activity', '>', $formatDate],
+                //['last_activity', '>', $formatDate],
                 //['id', '!=', $userId]
-            ])
+            ])->whereBetween('last_activity', [$formatDate, $date])
                 ->get()
                 ->toArray();
         } else {
