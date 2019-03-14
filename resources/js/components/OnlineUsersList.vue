@@ -26,6 +26,7 @@
         }
       },
 
+
       methods: {
            privateUser(user) {
                this.$emit('touser', {

@@ -42,6 +42,7 @@ const app = new Vue({
         toUser: [],
         publicChannel: 'private-chat',
         channels: [],
+        activeItem: 'test'
     },
     mounted() {
 
@@ -118,6 +119,7 @@ const app = new Vue({
         },
         //save user wich we will send message
         sendPrivateMessage(user) {
+           // console.log(this.activeItem);
             this.toUser = user.data;
         },
         updateSocketMessage(channels) {

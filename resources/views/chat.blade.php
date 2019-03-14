@@ -14,6 +14,7 @@
                     <div class="panel-footer">
                         <chat-form
                                 v-on:messagesent="addMessage"
+
                                 :user="{{ Auth::user() }}" :to-user="toUser"
                         ></chat-form>
                     </div>
@@ -24,7 +25,7 @@
                     <div class="panel-heading headerBorder">User online</div>
 
                     <div class="panel-body">
-                        <users-list v-on:touser="sendPrivateMessage" :chat-users="chatUsers"></users-list>
+                        <users-list ref="userlist" v-on:touser="sendPrivateMessage" :chat-users="chatUsers" :active-item="activeItem"></users-list>
 
                         <!--
                         <chat-messages :messages="messages"></chat-messages>

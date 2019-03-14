@@ -20,15 +20,20 @@
             }
         },
 
+
         methods: {
             sendMessage() {
-
+                //reset active user selector;
+                //refs userlist set in chat.blade.php
+                //get access to any components via reds
+                this.$root.$refs.userlist.activeItemId = '';
+                //send message
                 this.$emit('messagesent', {
                     user: this.user,
                     message: this.newMessage,
                     toUser: this.toUser
                 });
-
+                //reset message
                 this.newMessage = ''
             }
         }

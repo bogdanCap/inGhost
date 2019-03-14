@@ -1784,6 +1784,10 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     sendMessage: function sendMessage() {
+      //reset active user selector;
+      //refs userlist set in chat.blade.php
+      //get access to any components via reds
+      this.$root.$refs.userlist.activeItemId = '';
       this.$emit('messagesent', {
         user: this.user,
         message: this.newMessage,
@@ -59472,7 +59476,8 @@ var app = new Vue({
     chatUsers: [],
     toUser: [],
     publicChannel: 'private-chat',
-    channels: []
+    channels: [],
+    activeItem: 'test'
   },
   mounted: function mounted() {},
   created: function created() {
@@ -59559,6 +59564,7 @@ var app = new Vue({
     },
     //save user wich we will send message
     sendPrivateMessage: function sendPrivateMessage(user) {
+      // console.log(this.activeItem);
       this.toUser = user.data;
     },
     updateSocketMessage: function updateSocketMessage(channels) {
