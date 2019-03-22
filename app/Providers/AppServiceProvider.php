@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Http\Service\ChatService;
+use App\Observers\UserObserver;
+use App\User;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('ChatService', function ($app) {
             return new ChatService();
         });
+
+
     }
 
     /**
@@ -26,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        //registering model observer
+        User::observe(UserObserver::class);
     }
 }
